@@ -1,0 +1,37 @@
+version: "3.9"
+
+services: 
+
+  api:
+    #build: ./
+    image: api:go
+    ports: 
+      - "1200:8080"
+    container_name: go-api
+    volumes:
+      - .:/usr/src/goApp
+    env_file:
+      - ./env.env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
+      PROXY_ADDRESS: proxy
+      #GIN_MODE: release
+    networks:
+      - default
+
+  proxy:
+    #build: ./proxy
+    image: sql-proxy:go
+    ports: 
+      - "1433:1433"
+    container_name: cloudSql-proxy
+    volumes:
+      - ./proxy:/usr/src/proxy
+    command: bash -c "cloud_sql_proxy -instances=deft-idiom-324423:us-central1:olympics=tcp:0.0.0.0:1433 -credential_file=/usr/src/proxy/sql/k.json"
+    networks:
+      - default
+
+networks: 
+  default:
+    driver: bridge
+    name: proxyNet
