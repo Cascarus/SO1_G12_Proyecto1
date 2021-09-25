@@ -6,11 +6,12 @@ import "github.com/gin-gonic/gin"
 import (
 	"fmt"
 	"net/http"
-    //"context"
+    "os"
     ts "goApi/types"
     cos "goApi/cosmos"
     sql "goApi/cloud"
     //ps "loadTester/pubSub"
+    "github.com/joho/godotenv"
 )
 
 
@@ -83,6 +84,7 @@ func validateDataBases(c *gin.Context){
     if ready {
         c.Next()
     }else{
+        c.JSON(http.StatusInternalServerError, "Must start a connection")
         c.AbortWithStatus(http.StatusInternalServerError)
     }
 }
@@ -90,20 +92,27 @@ func validateDataBases(c *gin.Context){
 
 func startLoad(c *gin.Context) {
     
-    _, err := cos.Connect()
-    if err != nil {
-        ready = false
-        c.JSON(http.StatusInternalServerError, "Cosmos DB failed :(")
+    if !ready {
+
+        _, err := cos.Connect()
+        if err != nil {
+            ready = false
+            c.JSON(http.StatusInternalServerError, "Cosmos DB failed :(")
+        }
+    
+        err1 := sql.Init() 
+        if err1 != nil {
+            ready = false
+            c.JSON(http.StatusInternalServerError, "SQL CLoud failed :(")
+        }else{
+            ready = true
+            c.JSON(http.StatusInternalServerError, "All set!")
+        }
+
+    }else{
+        c.JSON(http.StatusInternalServerError, "Connection already started")
     }
 
-    err1 := sql.Init() 
-    if err1 != nil {
-        ready = false
-        c.JSON(http.StatusInternalServerError, "SQL CLoud failed :(")
-    }else{
-        ready = true
-        c.JSON(http.StatusInternalServerError, "All set!")            
-    }
 }
 
 
@@ -123,6 +132,14 @@ var ready bool
 
 func main() {
 
+    if os.Getenv("DB")==""{
+        err := godotenv.Load("env.env")
+        if err!=nil{
+            fmt.Println("Error loading enviroment variables")
+        }
+
+    }
+
     fmt.Println("")
     fmt.Println(" ==========================  SERVIDOR  ========================== ")
     fmt.Println("")
@@ -135,6 +152,10 @@ func main() {
     router.GET("/getTuits", getTuits)
     router.GET("/getLogsCosmos", getLogsCosmos)
     router.GET("/getLogsCloud", getLogsCloud)
+    router.GET("/closeLoad", closeLoad)
 
     router.Run()
 }
+
+
+//   /home/sopes1_s2_2021_g14/sopes1/go/SO1_G12_Proyecto1/Apis/GoApi/

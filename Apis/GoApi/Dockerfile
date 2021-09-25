@@ -6,17 +6,7 @@ COPY . ./
 
 RUN apt-get update
 
-#RUN go mod init goApi 
-
-RUN go get -u github.com/gin-gonic/gin
-
-RUN go get go.mongodb.org/mongo-driver/bson/primitive
-
-RUN go get go.mongodb.org/mongo-driver/
-
-RUN go get github.com/go-sql-driver/mysql
-
-RUN go get go.mongodb.org/mongo-driver/mongo/options
+RUN go mod download
 
 #RUN apt-get install -y nodejs
 
