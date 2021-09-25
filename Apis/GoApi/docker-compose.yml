@@ -20,7 +20,7 @@ services:
       - default
 
   proxy:
-    #build: ./proxy
+    build: ./proxy
     image: sql-proxy:go
     ports: 
       - "1433:1433"
