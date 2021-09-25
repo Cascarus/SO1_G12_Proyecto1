@@ -6,11 +6,12 @@ import "github.com/gin-gonic/gin"
 import (
 	"fmt"
 	"net/http"
-    //"context"
+    "os"
     ts "goApi/types"
     cos "goApi/cosmos"
     sql "goApi/cloud"
     //ps "loadTester/pubSub"
+    "github.com/joho/godotenv"
 )
 
 
@@ -130,6 +131,14 @@ var cloudLogs[] ts.Log
 var ready bool
 
 func main() {
+
+    if os.Getenv("DB")==""{
+        err := godotenv.Load("env.env")
+        if err!=nil{
+            fmt.Println("Error loading enviroment variables")
+        }
+
+    }
 
     fmt.Println("")
     fmt.Println(" ==========================  SERVIDOR  ========================== ")

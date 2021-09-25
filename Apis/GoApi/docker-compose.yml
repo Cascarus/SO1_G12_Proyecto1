@@ -3,13 +3,13 @@ version: "3.9"
 services: 
 
   api:
-    #build: ./
+    build: ./
     image: api:go
     ports: 
       - "1200:8080"
     container_name: go-api
     volumes:
-      - .:/usr/src/goApp
+    - .:/usr/src/goApp
     env_file:
       - ./env.env
     environment:
