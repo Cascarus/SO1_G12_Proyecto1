@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"os"
 	"errors"
-
 	"log"
 	"context"
 	"cloud.google.com/go/pubsub"
+	ts "goApi/types"
+	"strconv"
 )
 
 var topic *pubsub.Topic
 
-func InitPubSub() {
+func InitPubSub(message ts.Message) {
 
 	err:= start()
 
@@ -20,8 +21,8 @@ func InitPubSub() {
 		fmt.Println("Not connected to topic")
 	}else{
 		fmt.Println("Connected to topic")
-		err:= publishMessage(os.Getenv("PROYECT"), "olympics")
-		//topic.Stop()
+		err:= publishMessage(message)
+		topic.Stop()
 
 		if err!= nil{
 			fmt.Println("Message not published")
@@ -64,24 +65,33 @@ func start() error {
 }
 
 
-func publishMessage(projectID, topicID string) error {
+func publishMessage(message ts.Message) error {
 
 	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, projectID)
+	client, err := pubsub.NewClient(ctx, os.Getenv("PROYECT"))
 	if err != nil {
 		fmt.Println("Error 1")
 		return fmt.Errorf("pubsub.NewClient: %v", err)
 	}
 	defer client.Close()
 
-	t := client.Topic(topicID)
+	t := client.Topic("olympics")
 	result := t.Publish(ctx, &pubsub.Message{
-			Data: []byte("Hello world!"),
+			Data: []byte("Load completed!"),
 			Attributes: map[string]string{
-					"origin":   "golang",
-					"username": "gcp",
+					"guardados":   strconv.Itoa(message.Guardados),
+					"api": message.Api,
+					"tiempoCarga":   message.TiempoCarga,
+					"db":   message.Db,
 			},
 	})
+	/*
+	Guardados int `json:"guardados"`
+	api string `json:"api"`
+	tiempoCarga string `json:"tiempoCarga"`
+	db string `json:"db"`
+	*/
+
 	// Block until the result is returned and a server-generated
 	// ID is returned for the published message.
 	id, err := result.Get(ctx)

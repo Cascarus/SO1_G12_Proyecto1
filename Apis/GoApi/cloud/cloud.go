@@ -77,7 +77,6 @@ func Insert(tuit ts.Tuit) (string, error) {
 }
 
 /*
-
 use Olympics;
 
 create table OLIMPIC(
@@ -93,5 +92,4 @@ create table OLIMPIC(
 );
 
 select * from OLIMPIC;
-
 */
