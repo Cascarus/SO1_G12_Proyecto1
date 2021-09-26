@@ -1,0 +1,16 @@
+version: "3.9"
+
+services: 
+
+  loadTest:
+    #build: ./
+    image: load-tester:go
+    ports: 
+      - "1300:8080"
+    container_name: go-loadTest
+    volumes:
+      - .:/usr/src/goApp
+    #env_file:
+    # - ../ps.env
+    environment:
+      API_HOST: http://35.208.39.101:1200

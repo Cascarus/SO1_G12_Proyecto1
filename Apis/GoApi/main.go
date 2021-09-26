@@ -7,16 +7,17 @@ import (
 	"fmt"
 	"net/http"
     "os"
+    "time"
     ts "goApi/types"
     cos "goApi/cosmos"
     sql "goApi/cloud"
-    //ps "loadTester/pubSub"
+    ps "goApi/pubSub"
     "github.com/joho/godotenv"
 )
 
 
 func postTuitCosmos(c *gin.Context) {
-    
+    t := time.Now()
     var newTuit ts.Tuit
 
     fmt.Println("======================== POSTING TUIT IN COSMOS ========================")
@@ -31,11 +32,11 @@ func postTuitCosmos(c *gin.Context) {
 
     if err!=nil{
         fmt.Println(err)
-        cosmosLogs = append(cosmosLogs, ts.Log{ StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err) } )
-        c.JSON(http.StatusInternalServerError, ts.Log{StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err)})
+        cosmosLogs = append(cosmosLogs, ts.Log{ StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err), Time:time.Since(t) })
+        c.JSON(http.StatusInternalServerError, ts.Log{StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err), Time:time.Since(t) })
     }else{
-        cosmosLogs = append(cosmosLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:msg } )
-        c.JSON(http.StatusCreated, ts.Log{ StatusNumber:http.StatusCreated, Message:msg })
+        cosmosLogs = append(cosmosLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:msg, Time:time.Since(t) } )
+        c.JSON(http.StatusCreated, ts.Log{ StatusNumber:http.StatusCreated, Message:msg, Time:time.Since(t) })
     }
 
 }
@@ -43,6 +44,7 @@ func postTuitCosmos(c *gin.Context) {
 
 
 func postTuitCloud(c *gin.Context) {
+    t := time.Now()
     
     var newTuit ts.Tuit
 
@@ -58,11 +60,11 @@ func postTuitCloud(c *gin.Context) {
 
     if err!=nil{
         fmt.Println(err)
-        cloudLogs = append(cloudLogs, ts.Log{ StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err) } )
-        c.JSON(http.StatusInternalServerError, ts.Log{StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err)})
+        cloudLogs = append(cloudLogs, ts.Log{ StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err), Time:time.Since(t) })
+        c.JSON(http.StatusInternalServerError, ts.Log{StatusNumber:http.StatusInternalServerError, Message:fmt.Sprint(err), Time:time.Since(t) })
     }else{
-        cloudLogs = append(cloudLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:msg } )
-        c.JSON(http.StatusCreated, ts.Log{ StatusNumber:http.StatusCreated, Message:msg })
+        cloudLogs = append(cloudLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:msg, Time:time.Since(t) })
+        c.JSON(http.StatusCreated, ts.Log{ StatusNumber:http.StatusCreated, Message:msg, Time:time.Since(t) })
     }
 
 }
@@ -89,6 +91,30 @@ func validateDataBases(c *gin.Context){
     }
 }
 
+
+func pubilshResults(){
+
+    var timeCosmos time.Duration
+    var timeCloud time.Duration
+
+    for i := 0; i < len(cosmosLogs); i++ {
+        timeCosmos+=cosmosLogs[i].Time
+    }
+    ps.InitPubSub(ts.Message{ Guardados:len(cosmosLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCosmos), Db:"Azure Cosmos"})
+
+
+    for i := 0; i < len(cloudLogs); i++ {
+        timeCloud+=cloudLogs[i].Time
+    }
+    ps.InitPubSub(ts.Message{ Guardados:len(cloudLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCloud), Db:"Cloud SQL"})
+
+}
+/*
+	Guardados int `json:"guardados"`
+	api string `json:"api"`
+	tiempoCarga string `json:"tiempoCarga"`
+	db string `json:"db"`
+*/
 
 func startLoad(c *gin.Context) {
     
@@ -119,7 +145,9 @@ func startLoad(c *gin.Context) {
 func closeLoad(c *gin.Context){
 
     ready = false
-    c.JSON(http.StatusInternalServerError, "Connections closed")            
+    c.JSON(http.StatusInternalServerError, "Connections closed")
+    
+    pubilshResults()
 
 }
 
@@ -146,13 +174,13 @@ func main() {
 	router := gin.Default()
     router.Use(gin.Recovery()) // Para recuperarse de Errores y enviar un 500
 
-    router.GET("/startLoad", startLoad)
-    router.POST("/addTuit/cosmos", validateDataBases, postTuitCosmos)
-    router.POST("/addTuit/cloud", validateDataBases, postTuitCloud)
-    router.GET("/getTuits", getTuits)
-    router.GET("/getLogsCosmos", getLogsCosmos)
-    router.GET("/getLogsCloud", getLogsCloud)
-    router.GET("/closeLoad", closeLoad)
+    router.GET("/startLoad/go", startLoad)
+    router.POST("/addTuit/cosmos/go", validateDataBases, postTuitCosmos)
+    router.POST("/addTuit/cloud/go", validateDataBases, postTuitCloud)
+    router.GET("/getTuits/go", getTuits)
+    router.GET("/getLogsCosmos/go", getLogsCosmos)
+    router.GET("/getLogsCloud/go", getLogsCloud)
+    router.GET("/closeLoad/go", closeLoad)
 
     router.Run()
 }
