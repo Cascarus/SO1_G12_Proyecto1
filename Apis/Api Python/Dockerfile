@@ -1,11 +1,11 @@
-FROM python:3
+FROM python:latest
 WORKDIR /app/src
-COPY . /app/src
+COPY . .
 RUN pip install --upgrade google-cloud-pubsub
 RUN pip install flask
 RUN pip install pymongo
-RUN pip install pyodbc
+RUN pip install mysql-connector-python
 RUN pip install waitress
 RUN pip install python-dotenv
 EXPOSE 5000
-CMD ["python", "Api.v2.py"]
+CMD ["python", "api.py"]
