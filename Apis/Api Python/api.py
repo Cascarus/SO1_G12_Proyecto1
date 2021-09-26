@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from google.cloud import pubsub_v1
+from dotenv import load_dotenv
 
 import mysql.connector
-
 import json
 
 service_account_info = json.load(open("PS.json"))
@@ -46,6 +46,10 @@ cargar: bool = False
 contadorSQL: int = 0
 contadorCosmos: int = 0
 
+'''
+GOOGLE PubSub
+'''
+load_dotenv('python_env.env')
 project_id = "deft-idiom-324423"
 topic_id = "olympics"
 
