@@ -1,15 +1,19 @@
+# DOCKER COMPOSE PARA PROBAR DE FORMA LOCAL
+# CONTIENE LA API, EL LOAD TESTER Y EL PROXY
+# LOS 3 SERVICIOS ESTAN DENTRO DE LA MISMA RED
+
 version: "3.9"
 
 services: 
 
   api:
-    build: ./
+    #build: ./GoApi
     image: api:go
     ports: 
       - "1200:8080"
     container_name: go-api
     volumes:
-    - .:/usr/src/goApp
+      - .:/usr/src/goApp
     env_file:
       - ./env.env
     environment:
@@ -19,8 +23,23 @@ services:
     networks:
       - default
 
+  loadTest:
+    #build: ./LoadTester
+    image: load-tester:go
+    ports: 
+      - "1300:8080"
+    container_name: go-loadTest
+    volumes:
+      - ../LoadTester:/usr/src/goApp
+    #env_file:
+    # - ../ps.env
+    environment:
+      API_HOST: http://api:8080
+    networks:
+      - default
+
   proxy:
-    build: ./proxy
+    #build: ./GoApi/proxy
     image: sql-proxy:go
     ports: 
       - "1433:1433"
