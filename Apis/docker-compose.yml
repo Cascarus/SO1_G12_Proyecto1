@@ -1,6 +1,4 @@
-# DOCKER COMPOSE PARA PROBAR DE FORMA LOCAL
-# CONTIENE LA API, EL LOAD TESTER Y EL PROXY
-# LOS 3 SERVICIOS ESTAN DENTRO DE LA MISMA RED
+# CONTIENE LAS 3 APIS
 
 version: "3.9"
 
@@ -19,7 +17,7 @@ services:
       #GIN_MODE: release
 
   python:
-    build: ./Api-Python
+    build: ./Api Python
     image: api:python
     ports:
       - 5000:5000
