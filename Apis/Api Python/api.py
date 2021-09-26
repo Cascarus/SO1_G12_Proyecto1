@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from google.cloud import pubsub_v1
+from dotenv import load_dotenv
 
-import pyodbc
-
+import mysql.connector
 import json
-from google.auth import jwt
 
 service_account_info = json.load(open("PS.json"))
 
@@ -30,25 +29,27 @@ container = cosmosDB['Tuits']
 '''
 Conexion con Google SQL SERVER
 '''
-server = '35.192.164.59'
+server = '34.122.151.115'
 database = 'Olympics'
-username = 'sqlserver'
+username = 'root'
 password = '123456'
-conSQL = pyodbc.connect(
-    'DRIVER={ODBC Driver 17 for SQL Server};'
-    'SERVER=' + server +
-    ';DATABASE=' + database +
-    ';UID=' + username +
-    ';PWD=' + password
+conMySQL = mysql.connector.connect(
+    host=server,
+    user=username,
+    password=password,
+    database=database
 )
 
-cursor = conSQL.cursor()
-cursor.execute("SET DATEFORMAT dmy")
+cursor = conMySQL.cursor()
 
 cargar: bool = False
 contadorSQL: int = 0
 contadorCosmos: int = 0
 
+'''
+GOOGLE PubSub
+'''
+load_dotenv('python_env.env')
 project_id = "deft-idiom-324423"
 topic_id = "olympics"
 
@@ -105,11 +106,11 @@ def publicarSQL(body):
     hashtags = hashtags[0:len(hashtags) - 1]
 
     query = """INSERT INTO OLIMPIC(nombre, comentario, fecha, hashtags, upvotes, downvotes)
-                   VALUES('{0}','{1}','{2}','{3}',{4},{5})""".format(body["nombre"], body["comentario"], body["fecha"],
-                                                                     hashtags, body["upvotes"], body["downvotes"])
+    VALUES('{0}','{1}',STR_TO_DATE('{2}', '%d/%m/%Y'),'{3}',{4},{5})""".format(body["nombre"], body["comentario"], body["fecha"],hashtags, body["upvotes"], body["downvotes"])
+
     try:
         cursor.execute(query)
-        conSQL.commit()
+        conMySQL.commit()
         incrementSqlCounter()
     except:
         return
