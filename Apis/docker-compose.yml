@@ -15,3 +15,9 @@ services:
     environment:
       GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
       #GIN_MODE: release              
+  
+  python:
+      build: ./Api Python
+      image: api:python
+      ports:
+        - 5000:5000 
