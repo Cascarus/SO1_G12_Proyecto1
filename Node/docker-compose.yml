@@ -1,0 +1,16 @@
+version: "3.9"
+
+services: 
+
+  api:
+    build: ./
+    image: node:api
+    ports: 
+      - "1500:3500"
+    container_name: olympics
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - ./.env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
