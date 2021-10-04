@@ -165,6 +165,7 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
         arreglo.push(mongo_db);
         publicar_mensaje(arreglo);
    }
+   /*
    unsafe{
     let mut vector:Vec<Notificacion> = Vec::new();
     let mysqldb = Notificacion{
@@ -175,11 +176,11 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
     };
     vector.push(mysqldb);
     publicar_mensaje(vector);
-
    }
+   */ 
 
     println!("se Finalizao carga");
-    let smsjson = Mensaje { mensaje: "Actualmente estas Conectado!".to_string() };
+    let smsjson = Mensaje { mensaje: "se Finalizo carga!".to_string() };
     return Json(smsjson);  
 }
 
