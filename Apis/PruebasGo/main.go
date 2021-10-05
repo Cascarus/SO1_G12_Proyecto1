@@ -15,9 +15,6 @@ func postTuitCloud(c *gin.Context) {
     fmt.Println("======================== POSTING TUIT IN SQL CLOUD ========================")
 
     // Call BindJSON to bind the received JSON to
-    if err := c.BindJSON(&newTuit); err != nil {
-        return
-    }
 
     err := sql.Init()
 
@@ -40,7 +37,7 @@ func main() {
 	router := gin.Default()
     router.Use(gin.Recovery()) // Para recuperarse de Errores y enviar un 500
 
-    router.POST("/addTuit/cloud/go", validateDataBases, postTuitCloud)
+    router.POST("/addTuit/cloud/go", postTuitCloud)
 
     router.Run()
 }

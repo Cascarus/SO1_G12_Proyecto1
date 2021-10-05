@@ -16,7 +16,7 @@ var db *sql.DB
 func Init() error {
 
 	//dns := os.Getenv("USER")+":"+os.Getenv("PASS")+"@tcp("+os.Getenv("PROXY_ADDRESS")+":1433)/"+os.Getenv("DB") // --> Using proxu
-    dns := os.Getenv("USER")+":"+os.Getenv("PASS")+"@tcp("+os.Getenv("DB_ADDR")+")/"+os.Getenv("DB") // --> Using the public IP
+    dns := "root:"+os.Getenv("PASS")+"@tcp("+os.Getenv("DB_ADDR")+")/"+os.Getenv("DB") // --> Using the public IP
 
     /*cfg := mysql.Config{
         User:   "",
@@ -36,8 +36,6 @@ func Init() error {
     
     db.SetMaxIdleConns(0)
     db.SetMaxOpenConns(20)
-
-    fmt.Println("asdas")
 
 	pingErr := db.Ping()
     if pingErr != nil {
