@@ -1,0 +1,14 @@
+# CONTIENE LAS 3 APIS
+
+version: "3.9"
+
+services: 
+
+  go:
+    build: ./
+    image: api2:go
+    ports: 
+      - "8080:8080"
+    container_name: go-api2
+    volumes:
+      - .:/usr/src/goApp
