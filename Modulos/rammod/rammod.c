@@ -47,7 +47,6 @@ static int my_proc_show(struct seq_file *m, void *v){
     if (cached < 0)
 		cached = 0;
 
-    //disponible = si_mem_available() << (PAGE_SHIFT - 10);
     totalRam = i.totalram << (PAGE_SHIFT - 10);
     free = i.freeram << (PAGE_SHIFT - 10);
     cached = cached << (PAGE_SHIFT - 10);
@@ -59,7 +58,7 @@ static int my_proc_show(struct seq_file *m, void *v){
     percentUse = totalUse * 10000 / totalRam;
 	
     // TOTALRAM,LIBRE,CACHED,BUFFER
-    seq_printf(m, "{\"ram_total\":%lu,\"ram_uso\":%lu,\"ram_libre\":%lu,\"ram_percent\":%lu}\n",(totalRam / 1000),(totalUse / 1000),(free / 1000), percentUse);
+    seq_printf(m, "%lu,%lu,%lu,%lu",(totalRam / 1000),(totalUse / 1000),(free / 1000), percentUse);
 
 	return 0;
 }

@@ -84,7 +84,7 @@ int escribir_archivo(struct seq_file *archivo, void *v)
  	usage_cpu = user+nice+sys+hirq+sirq+steal;
 	cpu_usage_percent = usage_cpu * 10000 / total_cpu;
 
-    seq_printf(archivo, "{\"procesos\": %ld, \"cpu_uso\": %li}\n", procesos, usage_cpu * 10000 / total_cpu);
+    seq_printf(archivo, "%ld,%li", procesos, usage_cpu * 10000 / total_cpu);
 	return 0;
 }
 
