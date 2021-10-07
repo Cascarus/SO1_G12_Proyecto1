@@ -3,12 +3,12 @@ import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 
-import testsRoutes from '../routes/tests.js';
+import tuitRoutes from '../routes/tuit.js'
+
 import subscribe from '../services/pubsub.js'
 
 //import './cloud.js';
-
-import ora from 'ora'
+import './cosmos.js'
 
 // INITIALIZE =====================================
 const app = express();
@@ -39,7 +39,7 @@ app.use(cors());
 
 // ROUTES =========================================
 
-app.use(testsRoutes)
+app.use(tuitRoutes)
 app.use((req, res, next) => {
     res.status(404).send('404 Not Found');
 });

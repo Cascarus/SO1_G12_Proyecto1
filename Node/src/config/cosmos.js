@@ -10,6 +10,8 @@ dotenv.config();
             useUnifiedTopology: true
         });
         console.log("Mongodb is connected to", db.connection.host);
+
+
     } catch (error) {
         console.error("Mongodb connection failed", error);
     }
