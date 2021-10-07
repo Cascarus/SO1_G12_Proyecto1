@@ -19,7 +19,8 @@ pub struct Tuits{
 
 #[derive(Debug,Deserialize,Serialize,PartialEq, Eq)]
 pub struct Notificacion{
-   pub guardados: i64,
+   pub guardadoscosmo: i64,
+   pub guardadosmysql: i64,
    pub api: String,
    pub tiempo: u64,
    pub db: String,
