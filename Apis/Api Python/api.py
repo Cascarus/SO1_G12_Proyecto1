@@ -24,7 +24,7 @@ connection_uri = f"mongodb://{username}:{password}@{host}:{port}/{db_name}?{args
 
 client = MongoClient(connection_uri)
 cosmosDB = client[db_name]
-container = cosmosDB['Tuits']
+container = cosmosDB['tuits']
 
 '''
 Conexion con Google SQL SERVER
