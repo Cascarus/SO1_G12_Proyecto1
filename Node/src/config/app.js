@@ -4,14 +4,24 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 
 import testsRoutes from '../routes/tests.js';
+import subscribe from '../services/pubsub.js'
+
+//import './cloud.js';
+
+import ora from 'ora'
 
 // INITIALIZE =====================================
 const app = express();
 dotenv.config();
-import subscribe from '../services/pubsub.js'
+
+import program from './cloudRT.js'
+
+program()
+    .then(() => console.log('Waiting for database events...'))
+    .catch(console.error);
 
 subscribe(1, process.env.SUBSCRIPTION, 3600)
-.catch(console.error);
+    .catch(console.error);
 //=================================================
 
 
@@ -30,7 +40,7 @@ app.use(cors());
 // ROUTES =========================================
 
 app.use(testsRoutes)
-app.use((req, res, next) =>{
+app.use((req, res, next) => {
     res.status(404).send('404 Not Found');
 });
 //=================================================

@@ -10,7 +10,7 @@ services:
     container_name: olympics
     volumes:
       - .:/usr/src/app
-    env_file:
-      - ./.env
-    environment:
-      GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
+    #env_file:
+    #  - ./.env
+    #environment:
+    #  GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
