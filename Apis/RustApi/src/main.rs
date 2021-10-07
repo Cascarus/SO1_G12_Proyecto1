@@ -140,7 +140,7 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
   pub async fn finalizar_carga(){
     unsafe{
          let info = Notificacion{
-                guardadoscosmo:  CONTADORSQLDB,
+                guardadoscosmo:  CONTADORCOSMODB,
                 guardadosmysql:  CONTADORSQLDB,
                 api: "rust".to_string(),
                 tiempo:   SEGUNDOSMYSQL,
