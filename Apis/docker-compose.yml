@@ -1,0 +1,29 @@
+# CONTIENE LAS 3 APIS
+
+version: "3.9"
+
+services: 
+
+  go:
+    build: ./GoApi
+    image: api:go
+    ports: 
+      - "8080:8080"
+    container_name: go-api
+    env_file:
+      - ./GoApi/env.env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ./PK/PS_key.json
+      #GIN_MODE: release              
+  
+  python:
+    build: ./Api Python
+    image: api:python
+    ports:
+      - 5000:5000
+
+  rust:
+    build: ./RustApi
+    image: api:rust
+    ports:
+      - 4000:4000

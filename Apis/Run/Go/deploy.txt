@@ -1,0 +1,12 @@
+export PROJECT_ID=proyecto1-sopes1-326709
+export REGION=us-central1
+export SERVICE=api-go
+
+gcloud builds submit \
+    --tag gcr.io/proyecto1-sopes1-326709/api-go
+
+gcloud run deploy $SERVICE \
+    --image grc.io/$PROJECT_ID/$SERVICE \
+    --platform managed \
+    --region $REGION \
+    --allow-unauthenticated

@@ -1,0 +1,14 @@
+version: "3.9"
+
+services: 
+
+  api:
+    build: ./
+    image: sql-proxy:go
+    ports: 
+      - "1433:1433"
+    container_name: cloudSql-proxy
+    volumes:
+      - .:/usr/src/proxy
+    env_file:
+      - ./conn.env

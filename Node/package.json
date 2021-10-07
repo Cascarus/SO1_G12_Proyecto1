@@ -1,0 +1,20 @@
+{
+  "name": "proyecto1-so1",
+  "version": "1.0.0",
+  "description": "Proyecto 1 - Sistemas operativos",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Grupo12",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/pubsub": "^2.17.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.12"
+  }
+}

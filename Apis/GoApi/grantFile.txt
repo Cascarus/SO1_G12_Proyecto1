@@ -1,0 +1,4 @@
+echo <password> | sudo -S docker-compose down && sudo docker-compose up
+
+chmod +x <fileName>
+chmod +x start.sh
