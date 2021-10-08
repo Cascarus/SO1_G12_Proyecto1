@@ -10,7 +10,7 @@ export const getTuitsCosmos = async (req, res) => {
 
 export const getTuitsCloud = async (req, res) => {
 
-    pool.query('select * from OLIMPIC order by id desc', function (error, results, fields) {
+    pool.query('select * from OLIMPIC order by idOlimpic desc', function (error, results, fields) {
         if (error) res.send({ status: 500, msg: error });
         res.send(results)
     });
