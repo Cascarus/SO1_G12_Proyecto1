@@ -1,8 +1,9 @@
-import { getTuits } from "../services/tuits.js";
+import { getTuitsCosmos, getTuitsCloud } from "../services/tuits.js";
 import { Router } from "express";
 const router = Router();
 
-router.get("/getTuits", getTuits);
+router.get("/getTuitsCosmos", getTuitsCosmos);
+router.get("/getTuitsCloud", getTuitsCloud);
 
 
 export default router;
