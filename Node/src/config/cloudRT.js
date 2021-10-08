@@ -1,8 +1,10 @@
 import MySQLEvents from '@rodrigogs/mysql-events';
 import pool from './cloud.js'
 
-const program = async () => {
 
+const program = async (socket) => {
+
+    socket.emit("Hola", "Hola desde sql")
 
     const instance = new MySQLEvents(pool, {
         startAtEnd: true
@@ -15,7 +17,7 @@ const program = async () => {
         expression: '*',
         statement: MySQLEvents.STATEMENTS.INSERT,
         onEvent: (event) => { // You will receive the events here
-            console.log(event.affectedRows[0].after);
+            socket.emit("SQL", event.affectedRows[0].after)
         },
     });
 

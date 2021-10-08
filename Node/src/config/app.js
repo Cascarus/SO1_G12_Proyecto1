@@ -14,12 +14,6 @@ import './cosmos.js'
 const app = express();
 dotenv.config();
 
-import program from './cloudRT.js'
-
-program()
-    .then(() => console.log('Waiting for database events...'))
-    .catch(console.error);
-
 subscribe(1, process.env.SUBSCRIPTION, 3600)
     .catch(console.error);
 //=================================================
@@ -39,6 +33,12 @@ app.use(cors());
 
 // ROUTES =========================================
 
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.use(tuitRoutes)
 app.use((req, res, next) => {
     res.status(404).send('404 Not Found');
@@ -47,6 +47,12 @@ app.use((req, res, next) => {
 
 
 // STATICS ========================================
+//=================================================
+
+
+// SOCKET ========================================
+
+
 //=================================================
 
 
