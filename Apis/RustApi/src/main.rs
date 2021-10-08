@@ -156,7 +156,7 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
         Ok(response) => {
         println!("{:?}", response);
         pubsub.stop();
-        std::process::exit(0);
+       // std::process::exit(0);
       }
         Err(e) => eprintln!("Failed sending message {}", e),}
         println!("se Finalizao carga");
