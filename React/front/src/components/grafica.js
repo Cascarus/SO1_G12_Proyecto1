@@ -130,4 +130,5 @@ class Grafica extends Component {
     }
 }
 
-export default Grafica;
+
+export default Grafica

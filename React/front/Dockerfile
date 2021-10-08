@@ -1,18 +1,17 @@
-FROM node:14 as build
-
-WORKDIR /usr/src/app
-
-COPY . .
-
+# build environment
+FROM node:14-alpine as react-build
+WORKDIR /app
+COPY . ./
 RUN npm install
-
 RUN npm run build --prod
 
-FROM nginx:latest as deploy
+# server environment
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/configfile.template
 
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
-COPY ./nginx.conf  /etc/nginx/conf.d/default.conf
+COPY --from=react-build /app/build /usr/share/nginx/html
 
-
-EXPOSE 80
-#CMD [ "npm", "start" ]
+ENV PORT 8080
+ENV HOST 0.0.0.0
+EXPOSE 8080
+CMD sh -c "envsubst '\$PORT' < /etc/nginx/conf.d/configfile.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"

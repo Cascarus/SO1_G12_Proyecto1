@@ -14,11 +14,11 @@ import axios from 'axios';
 import Grafica from "./grafica";
 
 const HOST = "http://35.223.137.189:1500";
+
 const socket = socketIOClient(HOST);
 
 var sqlT = [];
 var cosmosT = [];
-
 
 class Dashboard extends Component {
 
@@ -29,11 +29,14 @@ class Dashboard extends Component {
             db: "sql",
             tuits: [],
             downVotes: [],
-            upVotes: []
-
+            upVotes: [],
+            totalDownV: 0,
+            totalUpV: 0,
+            recientes: []
         }
 
         this.switchDB = this.switchDB.bind(this)
+        this.setVotes = this.setVotes.bind(this)
     }
 
 
@@ -42,25 +45,36 @@ class Dashboard extends Component {
         await axios.get(`${HOST}/getTuitsCloud`)
             .then((res) => {
                 this.setState({ tuits: res.data })
-                sqlT = res.data
                 this.setVotes(res.data)
-
 
             }).catch((err) => {
                 console.log(err)
             })
 
         socket.on("SQL", data => {
+            if (sqlT.length === 10) {
+                sqlT.pop()
+            }
+            var temp = this.state.tuits.concat(sqlT)
+            this.setVotes(temp)
+            //this.setVotes(this.state.tuits.unshift(data))
             sqlT.unshift(data)
-            this.setState({ tuits: sqlT })
+            this.setState({ recientes: sqlT })
         });
 
         socket.on("COSMOS", data => {
+            if (cosmosT.length === 10) {
+                cosmosT.pop()
+            }
+            var temp = this.state.tuits.concat(cosmosT)
+            this.setVotes(temp)
+            //this.setVotes(this.state.tuits.unshift(data.fullDocument))
             cosmosT.unshift(data.fullDocument)
-            this.setState({ db: "cosmos", tuits: cosmosT })
+            this.setState({ db: "cosmos", recientes: cosmosT })
         });
 
     }
+
 
     setVotes(res) {
 
@@ -70,8 +84,13 @@ class Dashboard extends Component {
         var downV = res.map(t => (
             t.downvotes
         ))
-        this.setState({ upVotes: upV, downVotes: downV })
-        console.log(this.state)
+        var dv = 0;
+        var uv = 0;
+        res.forEach(r => {
+            dv += r.downvotes;
+            uv += r.upvotes;
+        });
+        this.setState({ upVotes: upV, downVotes: downV, totalDownV: dv, totalUpV: uv })
     }
 
     async switchDB() {
@@ -80,9 +99,7 @@ class Dashboard extends Component {
 
             await axios.get(`${HOST}/getTuitsCosmos`)
                 .then((res) => {
-                    console.log(res.data)
                     this.setState({ tuits: res.data, db: "cosmos" })
-                    cosmosT = res.data
                     this.setVotes(res.data)
                 }).catch((err) => {
                     console.log(err)
@@ -93,7 +110,6 @@ class Dashboard extends Component {
             await axios.get(`${HOST}/getTuitsCloud`)
                 .then((res) => {
                     this.setState({ tuits: res.data, db: "sql" })
-                    sqlT = res.data
                     this.setVotes(res.data)
                 }).catch((err) => {
                     console.log(err)
@@ -128,10 +144,10 @@ class Dashboard extends Component {
                                 <h4 style={{ color: "black" }} >SQL Cloud</h4>
                                 <div className="navbar-brand me-5 negrita">
                                     <div className="form-check form-switch">
-                                        <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onChange={this.switchDB} />
+                                        <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onClick={this.switchDB} />
                                     </div>
                                 </div>
-                                <h3 style={{ color: "black" }} >Cosmo</h3>
+                                <h3 style={{ color: "black" }} >Cosmos</h3>
 
                             </div>
                         </nav>
@@ -143,7 +159,7 @@ class Dashboard extends Component {
                         <div className="col">
                             <div className="card card-body bg-success">
                                 <h3>
-                                    <BiUpvote size={30} > </BiUpvote> {this.state.upVotes.length} Upvotes
+                                    <BiUpvote size={30} > </BiUpvote> {this.state.totalUpV} Upvotes
                                 </h3>
                             </div>
                         </div>
@@ -159,7 +175,7 @@ class Dashboard extends Component {
                         <div className="col">
                             <div className="card card-body bg-warning">
                                 <h3 style={{ color: "black" }}>
-                                    <BiDownvote size={30}> </BiDownvote> {this.state.downVotes.length} Downvotes
+                                    <BiDownvote size={30}> </BiDownvote> {this.state.totalDownV} Downvotes
                                 </h3>
                             </div>
                         </div>
@@ -174,8 +190,8 @@ class Dashboard extends Component {
                                 <div className="card-header">
                                     <h2 style={{ color: "black" }} > Upvotes </h2>
                                 </div>
-                                <div className="card-body bg-dark">
-                                    <Grafica data={this.state.upVotes} height={500} width={600} max={1000} key={1} ></Grafica>
+                                <div className="card-body bg-dark" key={this.state.upVotes}>
+                                    <Grafica data={this.state.upVotes} height={300} width={600} max={1000} ></Grafica>
                                 </div>
                             </div>
                         </div>
@@ -184,16 +200,104 @@ class Dashboard extends Component {
                                 <div className="card-header">
                                     <h2 style={{ color: "black" }} > Upvotes </h2>
                                 </div>
-                                <div className="card-body bg-dark">
-                                    <Grafica data={this.state.downVotes} height={500} width={600} max={1000} key={2} ></Grafica>
+                                <div className="card-body bg-dark" key={this.state.downVotes}>
+                                    <Grafica data={this.state.downVotes} height={300} width={600} max={1000} ></Grafica>
                                 </div>
                             </div>
                         </div>
 
                     </div>
 
+                    <div className="row">
 
-                </Fragment>
+                        {
+                            this.state.recientes.length > 0 && this.state.db === "sql" &&
+
+                            sqlT.map((t, i) => {
+                                return (
+
+                                    <div className="col">
+                                        <div className="card" style={{ margin: "30px" }} >
+                                            <div className="card-body bg-secondary">
+
+                                                <div className="row">
+                                                    <div className="col">
+                                                        <h4> {t.nombre} </h4>
+                                                    </div>
+                                                    <div className="col">
+                                                        <i> {t.fecha} </i>
+                                                    </div>
+                                                </div>
+                                                <div className="col" style={{ margin: "20px" }}>
+                                                    <div>
+                                                        <h3>
+                                                            {t.comentario}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col">
+                                                        <BiDownvote size={30} > </BiDownvote> {t.downvotes}
+                                                    </div>
+                                                    <div className="col">
+                                                        <BiUpvote size={30} > </BiUpvote> {t.upvotes}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                )
+                            })
+
+                        }
+
+                        {
+                            this.state.recientes.length > 0 && this.state.db === "cosmos" &&
+
+                            cosmosT.map((t, i) => {
+                                return (
+
+                                    <div className="col">
+                                        <div className="card" style={{ margin: "30px" }} >
+                                            <div className="card-body bg-secondary">
+
+                                                <div className="row">
+                                                    <div className="col">
+                                                        <h4> {t.nombre} </h4>
+                                                    </div>
+                                                    <div className="col">
+                                                        <i> {t.fecha} </i>
+                                                    </div>
+                                                </div>
+                                                <div className="col" style={{ margin: "20px" }}>
+                                                    <div>
+                                                        <h3>
+                                                            {t.comentario}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col">
+                                                        <BiDownvote size={30} > </BiDownvote> {t.downvotes}
+                                                    </div>
+                                                    <div className="col">
+                                                        <BiUpvote size={30} > </BiUpvote> {t.upvotes}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                )
+                            })
+
+                        }
+
+                    </div>
+
+
+                </Fragment >
 
             )
         }
