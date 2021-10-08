@@ -25,7 +25,6 @@ type Log struct {
 
 
 type Message struct {
-
 	Guardados int `json:"guardados"`
 	Api string `json:"api"`
 	TiempoCarga string `json:"tiempoCarga"`

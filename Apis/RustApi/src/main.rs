@@ -82,7 +82,7 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
      let client_options = ClientOptions::parse(&database_url).await.unwrap();
      let client = Client::with_options(client_options).unwrap();
      let db = client.database("Olympics");
-     let collection = db.collection::<Tuits>("Tuits");      
+     let collection = db.collection::<Tuits>("tuits");      
      unsafe{
                        let  _tuiteo = Tuits {
                             nombre: _req.nombre.to_string(),
@@ -93,6 +93,8 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
                             downvotes: _req.downvotes
                           };
           collection.insert_one(_tuiteo, None).await.unwrap();
+          println!("Insertando datos a CosmoDB");
+                  
           CONTADORCOSMODB += 1;
      }          
     
@@ -124,21 +126,22 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
                   "hashtags" => &p.hashtags,
                   "upvotes" => p.upvotes,
                   "downvotes" => p.downvotes,})).unwrap();
-                  println!("Se inicio La carga en mysql");
+                  println!("Insertando datos a Mysql");
                   CONTADORSQLDB+=1;
                   let start = Instant::now();
                   let duration = start.saturating_duration_since(now);
                   SEGUNDOSMYSQL  = duration.as_secs();
 
                 }
-      println!("Se inicio La carga de Archivos");
+      println!("Se cargaron las Bases");
   }
 
 
   pub async fn finalizar_carga(){
     unsafe{
          let info = Notificacion{
-                guardados:  CONTADORSQLDB,
+                guardadoscosmo:  CONTADORCOSMODB,
+                guardadosmysql:  CONTADORSQLDB,
                 api: "rust".to_string(),
                 tiempo:   SEGUNDOSMYSQL,
                 db: "mysql/CosmoDB".to_string(),  
@@ -153,13 +156,11 @@ pub async fn post_publicar_carga(Json(_req): Json<Tuits>)-> impl IntoResponse {
         Ok(response) => {
         println!("{:?}", response);
         pubsub.stop();
-        std::process::exit(0);
+       // std::process::exit(0);
       }
         Err(e) => eprintln!("Failed sending message {}", e),}
         println!("se Finalizao carga");
-    
-
-    }// fin de unsafe
+     }// fin de unsafe
 }
 
 

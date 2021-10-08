@@ -1,5 +1,9 @@
 package types
 
+import (
+	"time"
+)
+
 type Tuit struct {
 
 	Nombre string `json:"nombre"`
@@ -11,11 +15,15 @@ type Tuit struct {
 
 }
 
-type Message struct{
-	Data string
-}
-
 type Log struct {
     StatusNumber int `json:"statusNumber"`
     Message string `json:"message"`
+	Time time.Duration `json:"time"`
+}
+
+type Message struct {
+	Guardados int `json:"guardados"`
+	Api string `json:"api"`
+	TiempoCarga string `json:"tiempoCarga"`
+	Db string `json:"db"`
 }

@@ -3,15 +3,19 @@ import express from 'express';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 
-import testsRoutes from '../routes/tests.js';
+import tuitRoutes from '../routes/tuit.js'
+
+import subscribe from '../services/pubsub.js'
+
+//import './cloud.js';
+import './cosmos.js'
 
 // INITIALIZE =====================================
 const app = express();
 dotenv.config();
-import subscribe from '../services/pubsub.js'
 
 subscribe(1, process.env.SUBSCRIPTION, 3600)
-.catch(console.error);
+    .catch(console.error);
 //=================================================
 
 
@@ -29,14 +33,26 @@ app.use(cors());
 
 // ROUTES =========================================
 
-app.use(testsRoutes)
-app.use((req, res, next) =>{
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+app.use(tuitRoutes)
+app.use((req, res, next) => {
     res.status(404).send('404 Not Found');
 });
 //=================================================
 
 
 // STATICS ========================================
+//=================================================
+
+
+// SOCKET ========================================
+
+
 //=================================================
 
 

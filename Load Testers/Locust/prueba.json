@@ -1,0 +1,74 @@
+[
+    {
+        "nombre": "Leonel Aguilar",
+        "comentario": "el dia de hoy el atleta juan perez logro oro",
+        "fecha": "24/7/2021",
+        "hashtags": ["remo","atletismo","natacion"],
+        "upvotes": 100,
+        "downvotes": 30
+    },
+    {
+        "nombre": "Juan Carlos",
+        "comentario": "Tiro y gano",
+        "fecha": "25/7/2021",
+        "hashtags": ["tiro","arco","tiroconarco"],
+        "upvotes": 100,
+        "downvotes": 30
+    },
+    {
+        "nombre": "Pedro Pablo Perez",
+        "comentario": "No gano medalla por lento",
+        "fecha": "28/7/2021",
+        "hashtags": ["coso1","coso2","coso3"],
+        "upvotes": 150,
+        "downvotes": 89
+    },
+    {
+        "nombre": "Olimpia Najera",
+        "comentario": "Cualquier cosa de preuba",
+        "fecha": "29/7/2021",
+        "hashtags": ["coso1","coso2","coso3","coso4"],
+        "upvotes": 11,
+        "downvotes": 8
+    },
+    {
+        "nombre": "Jasive Osorio",
+        "comentario": "Cualquier cosa de preuba",
+        "fecha": "30/7/2021",
+        "hashtags": ["coso1","coso2"],
+        "upvotes": 110,
+        "downvotes": 66
+    },
+    {
+        "nombre": "Patricia Mendez",
+        "comentario": "Cualquier cosa de preuba",
+        "fecha": "1/8/2021",
+        "hashtags": ["coso1","coso2","coso3","coso4"],
+        "upvotes": 500,
+        "downvotes": 10
+    },
+    {
+        "nombre": "Armando Mendoza",
+        "comentario": "Cualquier cosa de preuba",
+        "fecha": "1/8/2021",
+        "hashtags": ["coso1","coso2","coso3","coso4"],
+        "upvotes": 153,
+        "downvotes": 10
+    },
+    {
+        "nombre": "Leon Kennedy",
+        "comentario": "Cualquier cosa de preuba",
+        "fecha": "2/8/2021",
+        "hashtags": ["coso1","coso2","coso3","coso4"],
+        "upvotes": 267,
+        "downvotes": 55
+    },
+    {
+        "nombre": "Juana de Arco",
+        "comentario": "Cualquier cosa de prueba",
+        "fecha": "1/8/2021",
+        "hashtags": ["coso1","coso2","coso3","coso4"],
+        "upvotes": 354,
+        "downvotes": 156
+    }
+]
