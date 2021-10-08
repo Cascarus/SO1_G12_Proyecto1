@@ -1,4 +1,5 @@
-import program from './cloudRT.js'
+import cloud from './cloudRT.js'
+import cosmos from './cosmosRT.js'
 
 import { io } from "socket.io-client";
 
@@ -10,12 +11,16 @@ const SocketHandler = (io) => {
         // console.log(socket.handshake.url);
         console.log("nuevo socket connectado:", socket.id);
 
-        socket.on("hola", () => {
-            console.log("Hay alguien");
-        });
 
         socket.on("SQL", (data) => {
             console.log(data)
+            io.emit("SQL", data)
+        });
+
+        socket.on("COSMOS", (data) => {
+            console.log(data.fullDocument)
+
+            io.emit("COSMOS", data)
         });
 
         socket.on("disconnect", () => {
@@ -24,10 +29,11 @@ const SocketHandler = (io) => {
 
     });
 
-    program(socket)
+    cloud(socket)
         .then(() => console.log('Waiting for database events...'))
         .catch(console.error);
 
+    cosmos(socket)
 }
 
 

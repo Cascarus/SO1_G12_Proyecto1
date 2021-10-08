@@ -17,10 +17,8 @@ async function main() {
 
     SocketHandler(io)
 
-
-
-
     await console.log('Servidor publicado en puerto', app.get('port'));
+
 }
 
 main();

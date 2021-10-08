@@ -4,8 +4,6 @@ import pool from './cloud.js'
 
 const program = async (socket) => {
 
-    socket.emit("Hola", "Hola desde sql")
-
     const instance = new MySQLEvents(pool, {
         startAtEnd: true
     });
