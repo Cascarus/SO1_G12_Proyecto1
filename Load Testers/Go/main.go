@@ -41,6 +41,7 @@ func postNewTuitCosmos(tuit ts.Tuit){
 		log.Fatal(err)
 	}
 
+	t := time.Now() // EMPIEZA EL TIEMPO
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
 
@@ -57,11 +58,12 @@ func postNewTuitCosmos(tuit ts.Tuit){
 	json.Unmarshal([]byte(string(body)), &newLog)
 	logs = append(logs, newLog)
 
-	/*if resp.StatusCode != 500 {
+	if resp.StatusCode != 500 {
+		cosmosLogs = append(cosmosLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:string(body), Time:time.Since(t) } )
 		fmt.Println("Tuit loaded:", string(body))
 	}else{
 		fmt.Println("Error loading tuit: ", tuit)
-	}*/
+	}
 	
 	return
 }
@@ -77,6 +79,7 @@ func postNewTuitCloud(tuit ts.Tuit){
 		log.Fatal(err)
 	}
 
+	t := time.Now() // EMPIEZA EL TIEMPO
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
     req.Header.Set("Content-Type", "application/json")
 
@@ -93,11 +96,11 @@ func postNewTuitCloud(tuit ts.Tuit){
 	json.Unmarshal([]byte(string(body)), &newLog)
 	logs = append(logs, newLog)
 
-	/*if resp.StatusCode != 500 {
-		fmt.Println("Tuit loaded:", string(body))
+	if resp.StatusCode != 500 {
+		cloudLogs = append(cloudLogs, ts.Log{ StatusNumber:http.StatusCreated, Message:string(body), Time:time.Since(t) } )
 	}else{
 		fmt.Println("Error loading tuit: ", tuit)
-	}*/
+	}
 	
 	return
 }
@@ -121,8 +124,6 @@ func getData(){
     fmt.Println(string(body))
 }
 
-
-
 func start(){
 
 	resp, err := http.Get(os.Getenv("API_HOST")+"/startLoad/go")
@@ -142,9 +143,14 @@ func start(){
 }
 
 
-func finish(){
+func finish(msg ts.Message){
 
-	resp, err := http.Get(os.Getenv("API_HOST")+"/closeLoad/go")
+	json_data, err := json.Marshal(msg)
+    if err != nil {
+        return
+    }
+
+	resp, err := http.Post(os.Getenv("API_HOST")+"/closeLoad/go", "application/json", bytes.NewBuffer(json_data))
 
 	if err!= nil{
 		log.Fatal(err)
@@ -160,8 +166,34 @@ func finish(){
 	fmt.Println(string(body))
 }
 
-var logs[] ts.Log
+
+func sendResults(){
+
+	var timeCosmos time.Duration
+    var timeCloud time.Duration
+
+    for i := 0; i < len(cosmosLogs); i++ {
+        timeCosmos+=cosmosLogs[i].Time
+    }
+
+    finish(ts.Message{ Guardados:len(cosmosLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCosmos), Db:"Azure Cosmos"})
+
+
+    for i := 0; i < len(cloudLogs); i++ {
+        timeCloud+=cloudLogs[i].Time
+    }
+    finish(ts.Message{ Guardados:len(cloudLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCloud), Db:"Cloud SQL"})
+
+}
+
+
 var tuits[] ts.Tuit
+
+var cosmosLogs[] ts.Log
+var cloudLogs[] ts.Log
+var logs[] ts.Log
+
+
 func main() {
 	
 	fmt.Println("==================================== STARTING ====================================")
@@ -183,21 +215,11 @@ func main() {
 	fmt.Println("Tuits are going to be loaded in 5 seconds...")
 	time.Sleep(5 * time.Second)
 
-	/*newTuit := ts.Tuit{
-		Nombre: "Efrain Alvarez",
-		Comentario: "Cualquier cosa de preuba",
-		Fecha: "30/7/2021",
-		Hashtags: []string{"coso1","coso2"},
-		Upvotes: 110,
-		Downvotes: 66,
-	}
-	fmt.Println(newTuit)*/
 
 	dos()
-	finish()
-	fmt.Println(logs)
-	//fmt.Println(tuits)
-	//loadTuits(tuits[0])
+	sendResults()
+	fmt.Println(cosmosLogs)
+	fmt.Println(cloudLogs)
 }
 
 func uno(){
@@ -221,7 +243,7 @@ func dos(){
 	results := make(chan string, len(tuits))
 
 	go loadTuits(jobs, results, "azure")
-	go loadTuits(jobs, results, "google")
+	//go loadTuits(jobs, results, "google")
 
 	for i := 0; i < len(tuits); i++ {
 		jobs <- tuits[i]
