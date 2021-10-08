@@ -1,13 +1,17 @@
 import { Component, Fragment } from "react";
 
 import socketIOClient from 'socket.io-client';
-
 import { FaRedditAlien } from 'react-icons/fa'
 import { HiOutlineDocumentReport } from 'react-icons/hi'
+
 import { BiDownvote } from 'react-icons/bi'
 import { BiUpvote } from 'react-icons/bi'
+import { ImNewspaper } from 'react-icons/im'
+
+
 import axios from 'axios';
 
+import Grafica from "./grafica";
 
 const HOST = "http://35.223.137.189:1500";
 const socket = socketIOClient(HOST);
@@ -15,17 +19,21 @@ const socket = socketIOClient(HOST);
 var sqlT = [];
 var cosmosT = [];
 
-class Home extends Component {
+
+class Dashboard extends Component {
 
     constructor(props) {
-        super(props)
+        super(props);
+
         this.state = {
             db: "sql",
-            tuits: []
+            tuits: [],
+            downVotes: [],
+            upVotes: []
+
         }
 
         this.switchDB = this.switchDB.bind(this)
-        this.showHastags = this.showHastags.bind(this)
     }
 
 
@@ -35,6 +43,9 @@ class Home extends Component {
             .then((res) => {
                 this.setState({ tuits: res.data })
                 sqlT = res.data
+                this.setVotes(res.data)
+
+
             }).catch((err) => {
                 console.log(err)
             })
@@ -51,31 +62,16 @@ class Home extends Component {
 
     }
 
+    setVotes(res) {
 
-    showHastags(hashtags) {
-
-        if (this.state.db === "sql") {
-            return (
-                hashtags.split(',').map((h) => {
-                    return (
-                        <div className="col">
-                            <h4> #{h} </h4>
-                        </div>
-                    )
-                })
-            )
-        } else {
-            return (
-                hashtags.map((h) => {
-                    return (
-                        <div className="col">
-                            <h4> #{h} </h4>
-                        </div>
-                    )
-                })
-            )
-        }
-
+        var upV = res.map(t => (
+            t.upvotes
+        ))
+        var downV = res.map(t => (
+            t.downvotes
+        ))
+        this.setState({ upVotes: upV, downVotes: downV })
+        console.log(this.state)
     }
 
     async switchDB() {
@@ -84,8 +80,10 @@ class Home extends Component {
 
             await axios.get(`${HOST}/getTuitsCosmos`)
                 .then((res) => {
+                    console.log(res.data)
                     this.setState({ tuits: res.data, db: "cosmos" })
                     cosmosT = res.data
+                    this.setVotes(res.data)
                 }).catch((err) => {
                     console.log(err)
                 })
@@ -96,6 +94,7 @@ class Home extends Component {
                 .then((res) => {
                     this.setState({ tuits: res.data, db: "sql" })
                     sqlT = res.data
+                    this.setVotes(res.data)
                 }).catch((err) => {
                     console.log(err)
                 })
@@ -103,10 +102,9 @@ class Home extends Component {
 
     }
 
-
     render() {
 
-        if (this.state.tuits.length > 0) {
+        if (this.state.upVotes.length > 0) {
             return (
 
                 <Fragment>
@@ -133,74 +131,76 @@ class Home extends Component {
                                         <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onChange={this.switchDB} />
                                     </div>
                                 </div>
-                                <h3 style={{ color: "black" }} >Cosmos</h3>
+                                <h3 style={{ color: "black" }} >Cosmo</h3>
 
                             </div>
                         </nav>
 
                     </div>
 
-                    <div className="row">
+                    <div className="row" style={{ padding: "30px" }}>
 
-                        <div className="col-3" style={{ backgroundColor: "#141a15" }} >
+                        <div className="col">
+                            <div className="card card-body bg-success">
+                                <h3>
+                                    <BiUpvote size={30} > </BiUpvote> {this.state.upVotes.length} Upvotes
+                                </h3>
+                            </div>
                         </div>
 
-                        <div className="col-6">
-
-
-                            {this.state.tuits.map((t, i) => {
-                                return (
-
-                                    <div className="card" style={{ margin: "30px" }} key={i + t.nombre}>
-                                        <div className="card-body bg-dark">
-
-                                            <div className="row">
-                                                <div className="col">
-                                                    <h4> {t.nombre} </h4>
-                                                </div>
-                                                <div className="col">
-                                                    <i> {t.fecha} </i>
-                                                </div>
-                                            </div>
-                                            <div className="col" style={{ margin: "20px" }}>
-                                                <div>
-                                                    <h3>
-                                                        {t.comentario}
-                                                    </h3>
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col">
-                                                    <BiDownvote size={30} > </BiDownvote> {t.downvotes}
-                                                </div>
-                                                <div className="col">
-                                                    <BiUpvote size={30} > </BiUpvote> {t.upvotes}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="card-footer row" style={{ color: "blue" }}>
-                                            {
-                                                this.showHastags(t.hashtags)
-                                            }
-                                        </div>
-                                    </div>
-
-                                )
-                            })}
-
+                        <div className="col">
+                            <div className="card card-body bg-primary">
+                                <h3>
+                                    <ImNewspaper size={30} ></ImNewspaper> {this.state.tuits.length} Noticias
+                                </h3>
+                            </div>
                         </div>
 
-                        <div className="col-3" style={{ backgroundColor: "#141a15" }}>
+                        <div className="col">
+                            <div className="card card-body bg-warning">
+                                <h3 style={{ color: "black" }}>
+                                    <BiDownvote size={30}> </BiDownvote> {this.state.downVotes.length} Downvotes
+                                </h3>
+                            </div>
                         </div>
 
                     </div>
 
+
+                    <div className="row" style={{ justifyContent: "center", display: "flex", flexWrap: "wrap" }}>
+
+                        <div className="col" style={{ justifyContent: "flex-end", display: "flex", flexWrap: "wrap" }}>
+                            <div className="card">
+                                <div className="card-header">
+                                    <h2 style={{ color: "black" }} > Upvotes </h2>
+                                </div>
+                                <div className="card-body bg-dark">
+                                    <Grafica data={this.state.upVotes} height={500} width={600} max={1000} key={1} ></Grafica>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col" style={{ justifyContent: "flex-start", display: "flex", flexWrap: "wrap" }}>
+                            <div className="card">
+                                <div className="card-header">
+                                    <h2 style={{ color: "black" }} > Upvotes </h2>
+                                </div>
+                                <div className="card-body bg-dark">
+                                    <Grafica data={this.state.downVotes} height={500} width={600} max={1000} key={2} ></Grafica>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
                 </Fragment>
 
             )
-        } else {
+        }
+        else {
             return (
-                <div>
+
+                <Fragment>
 
                     <div className="row">
 
@@ -224,15 +224,15 @@ class Home extends Component {
                                         <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onChange={this.switchDB} />
                                     </div>
                                 </div>
-                                <h3 style={{ color: "black" }} >Cosmos</h3>
+                                <h3 style={{ color: "black" }} >Cosmo</h3>
 
                             </div>
                         </nav>
 
                     </div>
 
-                    <h1> Nada por aqui ...</h1>
-                </div>
+                </Fragment>
+
             )
         }
 
@@ -241,4 +241,4 @@ class Home extends Component {
 }
 
 
-export default Home
+export default Dashboard
