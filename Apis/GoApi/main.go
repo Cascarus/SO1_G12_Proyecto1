@@ -91,24 +91,6 @@ func validateDataBases(c *gin.Context){
     }
 }
 
-
-func pubilshResults(){
-
-    var timeCosmos time.Duration
-    var timeCloud time.Duration
-
-    for i := 0; i < len(cosmosLogs); i++ {
-        timeCosmos+=cosmosLogs[i].Time
-    }
-    ps.InitPubSub(ts.Message{ Guardados:len(cosmosLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCosmos), Db:"Azure Cosmos"})
-
-
-    for i := 0; i < len(cloudLogs); i++ {
-        timeCloud+=cloudLogs[i].Time
-    }
-    ps.InitPubSub(ts.Message{ Guardados:len(cloudLogs), Api:"Go", TiempoCarga: fmt.Sprint(timeCloud), Db:"Cloud SQL"})
-
-}
 /*
 	Guardados int `json:"guardados"`
 	api string `json:"api"`
@@ -144,10 +126,16 @@ func startLoad(c *gin.Context) {
 
 func closeLoad(c *gin.Context){
 
-    ready = false
-    c.JSON(http.StatusInternalServerError, "Connections closed")
+    //ready = false
+    var newMsg ts.Message
+
+    if err := c.BindJSON(&newMsg); err != nil {
+        return
+    }
+
+    ps.InitPubSub(newMsg)
     
-    pubilshResults()
+    c.JSON(http.StatusInternalServerError, "Connections closed")
 
 }
 
@@ -180,7 +168,7 @@ func main() {
     router.GET("/getTuits/go", getTuits)
     router.GET("/getLogsCosmos/go", getLogsCosmos)
     router.GET("/getLogsCloud/go", getLogsCloud)
-    router.GET("/closeLoad/go", closeLoad)
+    router.POST("/closeLoad/go", closeLoad)
 
     router.Run()
 }
